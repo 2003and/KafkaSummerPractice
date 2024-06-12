@@ -6,7 +6,7 @@ import lombok.Data;
 @Data
 public class JsonDto {
     @Nonnull
-    private String requestType;
+    private String requestMethod;
     @Nonnull
     private String url;
     private String body;

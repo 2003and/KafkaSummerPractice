@@ -2,10 +2,10 @@ package uni.dstu.kafka.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.exc.MismatchedInputException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import uni.dstu.kafka.dto.JsonDto;
 
 import java.util.Arrays;
 import java.util.stream.Collectors;
@@ -13,10 +13,10 @@ import java.util.stream.Collectors;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
-class JsonParserTest {
+class JsonParserServiceTest {
 
     @Autowired
-    private JsonParser parser;
+    private JsonParserService parser;
 
     @Test
     void testJsonParsingMandatoryFields() {
@@ -28,14 +28,14 @@ class JsonParserTest {
         assertThrows(
                 JsonMappingException.class,
                 () -> parser.parse("""
-                        {"requestType": %s}
+                        {"requestMethod": %s}
                         """.formatted(quote("GET")))
         );
 
         assertDoesNotThrow(
                 () -> parser.parse("""
                         {
-                          "requestType": %s,
+                          "requestMethod": %s,
                           "url": %s
                         }
                         """.formatted(quote("GET"), quote("https://localhost:8080")))
@@ -46,27 +46,20 @@ class JsonParserTest {
     void testJsonParsing() throws JsonProcessingException {
         final String JSON = """
                 {
-                  "requestType": %s,
+                  "requestMethod": %s,
                   "url": %s,
                   "body": %s,
-                  "httpHeaders": [
-                    %s
-                  ],
+                  "httpHeaders": %s,
                   "pathAndQuery": %s
                 }
                 """.formatted(
                 quote("GET"),
                 quote("https://localhost:8080"),
                 null,
-                quote(
-                        new String[]{
-                                "Content-Type: application/json",
-                                "User-Agent: Javazilla/99.99",
-                        }
-                ),
-                quote("/message")
-        );
-        assertEquals(parser.parse(JSON), "GET https://localhost:8080/message");
+                null,
+                null
+                );
+        assertEquals(parser.parse(JSON), new JsonDto("GET", "https://localhost:8080"));
     }
 
     private String quote(String str) {

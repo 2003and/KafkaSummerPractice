@@ -6,14 +6,18 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import uni.dstu.kafka.service.JsonParser;
+import uni.dstu.kafka.dto.JsonDto;
+import uni.dstu.kafka.service.HttpClientService;
+import uni.dstu.kafka.service.JsonParserService;
 
 @RestController
 @RequestMapping("json")
 public class JsonParseController {
 
     @Autowired
-    private JsonParser parser;
+    private JsonParserService parser;
+    @Autowired
+    private HttpClientService httpClient;
 
     @GetMapping
     public String echo() {
@@ -26,10 +30,11 @@ public class JsonParseController {
     приложении не должен использоваться с этими целями.
 
     Пример передачи самого простого JSON'а:
-    http://localhost:8080/json/parse?json=%7B%22requestType%22:%22GET%22,%22url%22:%22https://localhost:8080%22%7D
+    http://localhost:8080/json/process?json=%7B%22requestMethod%22:%22GET%22,%22url%22:%22http://localhost:8080%22%7D
     */
-    @GetMapping("parse")
-    public String loadJson(@RequestParam(value = "json", required = false) String json) throws JsonProcessingException {
-        return parser.parse(json);
+    @GetMapping("process")
+    public String processJson(@RequestParam(value = "json") String json) throws JsonProcessingException {
+        JsonDto jsonDto = parser.parse(json);
+        return httpClient.request(jsonDto);
     }
 }
