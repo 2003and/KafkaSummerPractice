@@ -7,7 +7,7 @@ import uni.dstu.kafka.service.CacheService;
 import java.util.List;
 
 @RestController
-@RequestMapping("json")
+@RequestMapping("/json")
 @RequiredArgsConstructor
 public class JsonParseController {
     private final CacheService cacheService;
